@@ -1,4 +1,3 @@
-
 const int sensor1_pin = 2;
 const int sensor2_pin = 3;
 const int sensor3_pin = 4;
@@ -15,6 +14,10 @@ void setup() {
   pinMode(sensor3_pin, INPUT);
   pinMode(led_pin, OUTPUT);
   digitalWrite(led_pin, LOW);
+  
+  PCICR |= 0b00000100;
+  PCMSK2 |= (1<<PD4);
+  
   
   attachInterrupt(digitalPinToInterrupt(sensor1_pin), sensor1_ISR, CHANGE);
   attachInterrupt(digitalPinToInterrupt(sensor2_pin), sensor2_ISR, CHANGE);
@@ -48,10 +51,7 @@ void loop() {
       Serial.println("Sensor 2 triggered!");
       sensor2_triggered = false;
     }
-    if (sensor3_triggered) {
-      Serial.println("Sensor 3 triggered!");
-      sensor3_triggered = false;
-    }
+    
   }
 }
 
@@ -72,4 +72,11 @@ ISR(TIMER1_COMPA_vect) {
   digitalWrite(led_pin, led_on ? HIGH : LOW);
   
   Serial.println("Timer interrupt occurred!");
+}
+ISR(PCINT2_vect){
+	digitalWrite(led_pin, HIGH);
+    delay(500);
+    digitalWrite(led_pin, LOW);
+    delay(500);
+    Serial.println("Sensor 3 triggered!");
 }
